@@ -1,0 +1,6 @@
+__title__ = "jw_plyflatten"
+__description__ = "Take a series of ply files and produce a digital elevation map"
+__url__ = "https://github.com/JaeWangL/plyflatten"
+__author__ = """JaeWang Lee"""
+__author_email__ = "JaeWangL <jnso5072@outlook.kr>"
+__version__ = "0.1.2"
