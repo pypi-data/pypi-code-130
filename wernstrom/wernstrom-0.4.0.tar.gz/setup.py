@@ -1,0 +1,30 @@
+# -*- coding: utf-8 -*-
+from setuptools import setup
+
+packages = \
+['wernstrom']
+
+package_data = \
+{'': ['*']}
+
+install_requires = \
+['numpy', 'pillow', 'squaternion']
+
+setup_kwargs = {
+    'name': 'wernstrom',
+    'version': '0.4.0',
+    'description': 'A minimal set of tools for working with the KITTI dataset in Python',
+    'long_description': '![KITTI](pics/wernstrom.png)\n\n![GitHub](https://img.shields.io/github/license/MomsFriendlyRobotCompany/wernstrom)\n![PyPI - Python Version](https://img.shields.io/pypi/pyversions/wernstrom)\n![PyPI](https://img.shields.io/pypi/v/wernstrom)\n![PyPI - Downloads](https://img.shields.io/pypi/dm/wernstrom?color=aqua)\n\n# wernstrom\n\nSo this package is a modification for what I use and a specific set of KITTI data that doesn\'t\nappear to follow the standard KITTI format.\n\nThis package provides a minimal set of tools for working with the KITTI dataset [[1]](#references) in Python. So far only the raw datasets and odometry benchmark datasets are supported, but we\'re working on adding support for the others. We welcome contributions from the community.\n\n## Assumptions\n\nThis package assumes that you have also downloaded the calibration data associated with the sequences you want to work on (these are separate files from the sequences themselves), and that the directory structure is unchanged from the original structure laid out in the KITTI zip files.\n\n## Notation\n\nHomogeneous coordinate transformations are provided as 4x4 `numpy.array` objects and are denoted as `T_destinationFrame_originFrame`.\n\nPinhole camera intrinsics for camera `N` are provided as 3x3 `numpy.array` objects and are denoted as `K_camN`. Stereo pair baselines are given in meters as `b_gray` for the monochrome stereo pair (`cam0` and `cam1`), and `b_rgb` for the color stereo pair (`cam2` and `cam3`).\n\n## Example\n\nCamera data is available via generators for easy sequential access (e.g., for visual odometry), and by indexed getter methods for random access (e.g., for deep learning). Images are loaded as `PIL.Image` objects using Pillow.\n\n```python\nimport wernstrom as pykitti\n\nbasedir = \'/your/dataset/dir\'\nsequence = \'19\'\n\n# The \'frames\' argument is optional - default: None, which loads the whole dataset.\n# Calibration, timestamps, and IMU data are read automatically.\n# Camera and velodyne data are available via properties that create generators\n# when accessed, or through getter methods that provide random access.\ndata = pykitti.raw(basedir, sequence, frames=range(0, 50, 5))\n\n# dataset.calib:         Calibration data are accessible as a named tuple\n# dataset.timestamps:    Timestamps are parsed into a list of datetime objects\n# dataset.oxts:          List of OXTS packets and 6-dof poses as named tuples\n# dataset.camN:          Returns a generator that loads individual images from camera N\n# dataset.get_camN(idx): Returns the image from camera N at idx\n# dataset.gray:          Returns a generator that loads monochrome stereo pairs (cam0, cam1)\n# dataset.get_gray(idx): Returns the monochrome stereo pair at idx\n# dataset.rgb:           Returns a generator that loads RGB stereo pairs (cam2, cam3)\n# dataset.get_rgb(idx):  Returns the RGB stereo pair at idx\n# dataset.position:      Returns an array of x,y positions in meters\n\npoint_cam0 = data.calib.T_cam0_velo.dot(point_velo)\n\npoint_imu = np.array([0,0,0,1])\npoint_w = [o.T_w_imu.dot(point_imu) for o in data.oxts]\n\nfor cam0_image in data.cam0:\n    # do something\n    pass\n\ncam2_image, cam3_image = data.get_rgb(3)\n```\n\n### Transforms `T_w_imu`\n\n"The T_w_imu convention refers to the transformation from IMU to the world coordinate system (so notation is T_destinationFrame_originFrame)." [ref](https://aws.amazon.com/blogs/machine-learning/labeling-data-for-3d-object-tracking-and-sensor-fusion-in-amazon-sagemaker-ground-truth/)\n\n### OpenCV\n\nPIL Image data can be converted to an OpenCV-friendly format using numpy and `cv2.cvtColor`:\n\n```python\nimg_np = np.array(img)\nimg_cv2 = cv2.cvtColor(img_np, cv2.COLOR_RGB2BGR)\n```\n\nNote: This package does not actually require that OpenCV be installed on your system, except to run `demo_raw_cv2.py`.\n\n## References\n\n- [1] A. Geiger, P. Lenz, C. Stiller, and R. Urtasun, "Vision meets robotics: The KITTI dataset," Int. J. Robot. Research (IJRR), vol. 32, no. 11, pp. 1231–1237, Sep. 2013. [http://www.cvlibs.net/datasets/kitti/](http://www.cvlibs.net/datasets/kitti/) [pdf](docs/Geiger2013IJRR.pdf)\n- [raw data format](docs/raw_data_format.md)\n\n# MIT License\n\n**Copyright (c) 2020 Kevin J. Walchko**\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the "Software"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE.\n`\n',
+    'author': 'walchko',
+    'author_email': 'walchko@users.noreply.github.com',
+    'maintainer': None,
+    'maintainer_email': None,
+    'url': 'https://github.com/MomsFriendlyRobotCompany/wernstrom',
+    'packages': packages,
+    'package_data': package_data,
+    'install_requires': install_requires,
+    'python_requires': '>=3.8',
+}
+
+
+setup(**setup_kwargs)
