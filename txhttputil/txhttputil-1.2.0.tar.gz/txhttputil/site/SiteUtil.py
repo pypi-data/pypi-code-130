@@ -1,0 +1,113 @@
+"""
+ * Created by Synerty Pty Ltd
+ *
+ * This software is open source, the MIT license applies.
+ *
+ * Website : http://www.synerty.com
+ * Support : support@synerty.com
+"""
+
+import pem
+import logging
+import platform
+from typing import Optional
+
+from twisted.internet import reactor
+from twisted.internet.ssl import TLSVersion
+from twisted.web import server
+
+from txhttputil.login_page.LoginElement import LoginElement
+from txhttputil.site.AuthCredentials import (
+    AllowAllAuthCredentials,
+    AuthCredentials,
+)
+from txhttputil.site.AuthSessionWrapper import FormBasedAuthSessionWrapper
+from txhttputil.site.FileUploadRequest import FileUploadRequest
+from txhttputil.site.RedirectToHttpsResource import RedirectToHttpsResource
+from txwebsocket.txws import WebSocketUpgradeHTTPChannel
+
+from txhttputil.util.SslUtil import parseTrustRootFromBundle
+
+logger = logging.getLogger(__name__)
+
+
+def setupSite(
+    name: str,
+    rootResource,
+    portNum: int = 8000,
+    credentialChecker: AuthCredentials = AllowAllAuthCredentials(),
+    enableLogin=True,
+    SiteProtocol=WebSocketUpgradeHTTPChannel,
+    redirectFromHttpPort: Optional[int] = None,
+    ssl: Optional[bool] = False,
+    sslEnableMutualTLS: Optional[bool] = False,
+    sslBundleFilePath: Optional[str] = None,
+    sslMutualTLSCertificateAuthorityBundleFilePath: Optional[str] = None,
+):
+    """Setup Site
+    Sets up the web site to listen for connections and serve the site.
+    Supports customisation of resources based on user details
+
+    @return: Port object
+    """
+    if redirectFromHttpPort is not None:
+        setupSite(
+            name="%s https redirect" % name,
+            portNum=redirectFromHttpPort,
+            rootResource=RedirectToHttpsResource(portNum),
+            enableLogin=False,
+        )
+
+    LoginElement.siteName = name
+
+    if enableLogin:
+        protectedResource = FormBasedAuthSessionWrapper(
+            rootResource, credentialChecker
+        )
+    else:
+        logger.critical("Resource protection disabled NO LOGIN REQUIRED")
+        protectedResource = rootResource
+
+    site = server.Site(protectedResource)
+    site.protocol = SiteProtocol
+    site.requestFactory = FileUploadRequest
+
+    if ssl:
+        proto = "https"
+
+        trustedCertificateAuthorities = None
+        if sslEnableMutualTLS:
+            trustedCertificateAuthorities = parseTrustRootFromBundle(
+                sslMutualTLSCertificateAuthorityBundleFilePath
+            )
+
+        contextFactory = pem.twisted.certificateOptionsFromFiles(
+            sslBundleFilePath,
+            trustRoot=trustedCertificateAuthorities,
+            raiseMinimumTo=TLSVersion.TLSv1_2,
+            # TODO: pass in diffie-hellman param
+            acceptableProtocols=[b"http/1.1"],
+        )
+        sitePort = reactor.listenSSL(portNum, site, contextFactory)
+
+    else:
+        proto = "http"
+        sitePort = reactor.listenTCP(portNum, site)
+
+    if platform.system() is "Linux":
+        import subprocess
+
+        ip = (
+            subprocess.getoutput("/sbin/ifconfig").split("\n")[1].split()[1][5:]
+        )
+    else:
+        ip = "0.0.0.0"
+
+    logger.info(
+        "%s is alive and listening on %s://%s:%s",
+        name,
+        proto,
+        ip,
+        sitePort.port,
+    )
+    return sitePort
