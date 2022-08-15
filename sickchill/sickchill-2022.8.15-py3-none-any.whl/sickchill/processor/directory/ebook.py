@@ -1,0 +1,2 @@
+class ProcessEBook:
+    pass
