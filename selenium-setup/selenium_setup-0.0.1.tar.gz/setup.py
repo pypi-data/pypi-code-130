@@ -1,0 +1,34 @@
+# -*- coding: utf-8 -*-
+from setuptools import setup
+
+package_dir = \
+{'': 'src'}
+
+packages = \
+['selenium_setup']
+
+package_data = \
+{'': ['*']}
+
+install_requires = \
+['httpx', 'rich', 'selenium', 'typer[all]', 'xmltodict']
+
+setup_kwargs = {
+    'name': 'selenium-setup',
+    'version': '0.0.1',
+    'description': '',
+    'long_description': "# selenium_setup\n\n[![pypi](https://img.shields.io/pypi/v/selenium_setup?color=%2334D058)](https://pypi.org/project/selenium_setup/)\n\n## install\n\n```shell\npip install selenium_setup\n```\n\n## CLI\n\n### download default version driver and unzip to CWD  \n\n```shell\npython -m selenium_setup\n```\n\n```console\nchrome ver = '104.0.5112.79'\nlinux64\ndownloading to: /path/to/chromedriver_linux64--104.0.5112.79.zip\n100% ━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 7.1/7.1 MB 200.8 kB/s\n```\n\n### list 10 links of some latest versions\n\n```shell\npython -m selenium_setup --list\n```\n\n```console\nchrome linux64:\n  105.0.5195.19  https://chromedriver.storage.googleapis.com/105.0.5195.19/chromedriver_linux64.zip\n  104.0.5112.79  https://chromedriver.storage.googleapis.com/104.0.5112.79/chromedriver_linux64.zip\n  103.0.5060.134 https://chromedriver.storage.googleapis.com/103.0.5060.134/chromedriver_linux64.zip\n  ...\n```\n\n### use with version\n\n```shell\npython -m selenium_setup --ver ...\n```\n",
+    'author': ' ',
+    'author_email': None,
+    'maintainer': None,
+    'maintainer_email': None,
+    'url': 'https://github.com/m9810223/selenium_setup',
+    'package_dir': package_dir,
+    'packages': packages,
+    'package_data': package_data,
+    'install_requires': install_requires,
+    'python_requires': '>=3.7,<4',
+}
+
+
+setup(**setup_kwargs)
