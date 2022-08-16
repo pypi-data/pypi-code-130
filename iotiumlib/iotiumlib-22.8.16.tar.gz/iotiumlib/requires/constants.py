@@ -1,0 +1,1 @@
+default_hwmonitoring_scan_interval = 5
