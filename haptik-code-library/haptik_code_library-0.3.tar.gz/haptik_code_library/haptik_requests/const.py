@@ -1,0 +1,6 @@
+from http import HTTPStatus
+
+HTTP_ERROR = "HTTPError"
+TIMEOUT_EXCEPTION = "Timeout"
+TIMEOUT_STATUS_CODE = HTTPStatus.REQUEST_TIMEOUT.value
+REQUEST_EXCEPTION = "RequestException"
