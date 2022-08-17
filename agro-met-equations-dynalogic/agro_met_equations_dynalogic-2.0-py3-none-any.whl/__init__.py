@@ -1,0 +1,5 @@
+from AgroMetEquations import auxiliary
+from AgroMetEquations import evapotranspiration_equations
+from AgroMetEquations import thornthwaite_mather_1955_waterbalance
+
+name = "AgroMetEquations"
