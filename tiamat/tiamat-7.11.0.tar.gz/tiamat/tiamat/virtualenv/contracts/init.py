@@ -1,0 +1,6 @@
+def sig_bin(hub, bname: str, **kwargs) -> list[str]:
+    ...
+
+
+def sig_create(hub, bname: str):
+    ...
