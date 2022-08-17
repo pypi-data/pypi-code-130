@@ -1,0 +1,1 @@
+from lectio_scraper import Lectio
