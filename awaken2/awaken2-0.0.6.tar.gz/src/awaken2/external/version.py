@@ -1,0 +1,63 @@
+# ╔══════════════════════════════════════════════════════════════════════════╗
+# ║ Copyright 2022. quinn.7@foxmail.com All rights reserved.                 ║
+# ║                                                                          ║
+# ║ Licensed under the Apache License, Version 2.0 (the "License");          ║
+# ║ you may not use this file except in compliance with the License.         ║
+# ║ You may obtain a copy of the License at                                  ║
+# ║                                                                          ║
+# ║ http://www.apache.org/licenses/LICENSE-2.0                               ║
+# ║                                                                          ║
+# ║ Unless required by applicable law or agreed to in writing, software      ║
+# ║ distributed under the License is distributed on an "AS IS" BASIS,        ║
+# ║ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. ║
+# ║ See the License for the specific language governing permissions and      ║
+# ║ limitations under the License.                                           ║
+# ╚══════════════════════════════════════════════════════════════════════════╝
+"""
+@ 模块     : 命令行指令::检查版本
+@ 作者     : chenjiancheng
+@ 邮箱     : quinn.7@foxmail.com
+@ 编写时间 : 2022-08-10
+
+@ 模块描述 :
+    NULL
+
+"""
+import re
+import subprocess
+
+from ..awaken_info import ProjectInfo
+from ..baseic.common import window_template_output
+
+
+def instruction_version():
+    """
+    [ 命令行指令::检查版本 ]
+
+    ---
+    参数:
+        argv { list } : 参数列表
+
+    """
+    dialog_box_title = '- 创建项目 -'
+
+    window_template_output(
+        [
+            dialog_box_title,
+            None,
+            '正在查询 PYPI 服务器...',
+        ]
+    )
+
+    dos_result = subprocess.Popen(f'pip install {ProjectInfo.Name}==', stderr=subprocess.PIPE)
+    _, err = dos_result.communicate()
+    newest_version = re.findall(r'from versions: (.*)\)', str(err))[0].split(',')[-1].strip()
+    window_template_output(
+        [
+            dialog_box_title,
+            None,
+            f'当前版本: { ProjectInfo.Version }',
+            f'最新版本: { newest_version }',
+        ]
+    )
+    exit(0)
