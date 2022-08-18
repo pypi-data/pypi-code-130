@@ -1,0 +1,21 @@
+# -*- coding: utf-8 -*-
+# Helper functions for fields validation
+
+from collective.z3cform.norobots.i18n import norobotsMessageFactory as _
+from zope import schema
+
+import re
+
+
+class IsEmailError(schema.ValidationError):
+    __doc__ = _("""You entered an invalid email address.""")
+
+
+def isEmail(value):
+    expr = re.compile(
+        r"^(\w&.%#$&'\*+-/=?^_`{}|~]+!)*[\w&.%#$&'\*+-/=?^_`{}|~]+@(([0-9a-z]([0-9a-z-]*[0-9a-z])?\.)+[a-z]{2,6}|([0-9]{1,3}\.){3}[0-9]{1,3})$",
+        re.IGNORECASE,
+    )
+    if expr.match(value):
+        return True
+    raise IsEmailError
