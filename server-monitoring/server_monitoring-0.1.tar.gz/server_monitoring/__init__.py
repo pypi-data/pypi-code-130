@@ -1,0 +1,1 @@
+from .getlogs import getlog
