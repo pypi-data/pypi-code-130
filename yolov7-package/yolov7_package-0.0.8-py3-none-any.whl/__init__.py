@@ -1,0 +1,1 @@
+from yolov7_package.detect import Yolov7Detector
