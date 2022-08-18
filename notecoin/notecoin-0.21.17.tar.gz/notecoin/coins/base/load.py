@@ -1,0 +1,111 @@
+import csv
+import json
+import logging
+import time
+
+import ccxt
+import pandas as pd
+from ccxt.base.exchange import Exchange
+from tqdm import tqdm
+
+logger = logging.getLogger()
+unix_month = 2678400000
+one_hour = 3600 * 1000
+
+
+class LoadData:
+    def __init__(self, exchange: Exchange, csv_path, unix_start, unix_end, *args, **kwargs):
+        self.exchange = exchange
+        self.csv_path = csv_path
+        self.unix_start = unix_start
+        self.unix_end = unix_end
+
+    def load_all(self, *args, **kwargs):
+        self.exchange.load_markets()
+        pbr = tqdm(self.exchange.symbols)
+        for sym in pbr:
+            if ':' not in sym:
+                pbr.set_description(sym)
+                self.load(sym, *args, **kwargs)
+
+    def load(self, symbol, *args, **kwargs):
+        pass
+
+    def write_data(self, data_list):
+        df = pd.DataFrame(data_list)
+        df = df[(df['timestamp'] >= self.unix_start) & (df['timestamp'] <= self.unix_end)]
+        self._write(json.loads(df.to_json(orient='records')))
+
+    def _write(self, data_list):
+        pass
+
+
+class LoadDataKline(LoadData):
+    def __init__(self, *args, timeframe='1m', **kwargs):
+        super(LoadDataKline, self).__init__(*args, **kwargs)
+        self.timeframe = timeframe
+        self.csv_writer = csv.DictWriter(open(self.csv_path, mode="w"), delimiter=",",
+                                         fieldnames=["symbol", "timestamp", "open", "close", "low", "high", "vol"])
+
+    def _write(self, data_list):
+        self.csv_writer.writerows(data_list)
+
+    def load(self, symbol, *args, **kwargs):
+        unix_temp = self.unix_start
+        while unix_temp < self.unix_end:
+            try:
+                result = self.exchange.fetch_ohlcv(symbol, self.timeframe, unix_temp, limit=100)
+                result = self.exchange.sort_by(result, 0)
+                if len(result) == 0:
+                    break
+                unix_temp = result[-1][0]
+                df = pd.DataFrame(result, columns=['timestamp', 'open', 'close', 'low', 'high', 'vol'])
+                df['symbol'] = symbol
+                self.write_data(json.loads(df.to_json(orient='records')))
+                time.sleep(int(self.exchange.rateLimit / 1000))
+            except Exception as e:
+                print(type(e).__name__, str(e))
+                self.exchange.sleep(10000)
+
+
+class LoadTradeKline(LoadData):
+    def __init__(self, *args, **kwargs):
+        super(LoadTradeKline, self).__init__(*args, **kwargs)
+        self.csv_writer = csv.DictWriter(open(self.csv_path, mode="w"), delimiter=",",
+                                         fieldnames=["symbol", "id", "timestamp", "type", "side", "price", "amount"])
+
+    def _write(self, data_list):
+        self.csv_writer.writerows(data_list)
+
+    def load(self, symbol, *args, **kwargs):
+        unix_temp = self.unix_start
+        previous_trade_id = None
+
+        while unix_temp < self.unix_end:
+            try:
+                trades = self.exchange.fetch_trades(symbol, unix_temp, limit=1000)
+                if len(trades) == 0:
+                    unix_temp += one_hour
+                    continue
+                last_trade = trades[-1]
+                if previous_trade_id == last_trade['id']:
+                    unix_temp += one_hour
+                    continue
+                unix_temp = last_trade['timestamp']
+                previous_trade_id = last_trade['id']
+
+                result = [{
+                    'symbol': trade['symbol'],
+                    'id': trade['id'].replace('\n', ''),
+                    'timestamp': trade['timestamp'],
+                    'type': trade['type'],
+                    'side': trade['side'],
+                    'price': trade['price'],
+                    'amount': trade['amount'],
+                } for trade in trades]
+
+                self.write_data(result)
+                time.sleep(int(self.exchange.rateLimit / 1000))
+            except ccxt.NetworkError as e:
+                print(type(e).__name__, str(e))
+                self.exchange.sleep(10000)
