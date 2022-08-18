@@ -1,0 +1,50 @@
+#!/usr/bin/env python
+
+"""The setup script."""
+
+from setuptools import setup, find_packages
+
+with open('README.md') as readme_file:
+    readme = readme_file.read()
+
+with open('HISTORY.rst') as history_file:
+    history = history_file.read()
+
+requirements = open("requirements.txt").readlines()
+
+test_requirements = ['pytest>=3', ]
+
+setup(
+    author="nilecui",
+    author_email='nilecui@gmail.com',
+    python_requires='>=3.6',
+    classifiers=[
+        'Development Status :: 2 - Pre-Alpha',
+        'Intended Audience :: Developers',
+        'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
+        'Natural Language :: English',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
+    ],
+    description="keywords extract",
+    entry_points={
+        'console_scripts': [
+            'keywords_en=keywords_en.cli:main',
+        ],
+    },
+    install_requires=requirements,
+    license="GNU General Public License v3",
+    long_description=readme,
+    long_description_content_type="text/markdown",  # 长描述内容类型
+    include_package_data=True,
+    keywords='keywords_en',
+    name='keywords_en',
+    packages=find_packages(include=['keywords_en', 'keywords_en.*']),
+    test_suite='tests',
+    tests_require=test_requirements,
+    url='https://github.com/nilecui/keywords_en',
+    version='0.1.3',
+    zip_safe=False,
+)
