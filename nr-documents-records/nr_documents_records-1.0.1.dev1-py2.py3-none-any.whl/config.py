@@ -1,0 +1,9 @@
+from nr_documents_records.resources.config import NRDocumentRecordResourceConfig
+from nr_documents_records.resources.resource import NRDocumentRecordResource
+from nr_documents_records.services.config import NRDocumentRecordServiceConfig
+from nr_documents_records.services.service import NRDocumentRecordService
+
+NR_DOCUMENTS_RECORDS_RESOURCE_CONFIG = NRDocumentRecordResourceConfig
+NR_DOCUMENTS_RECORDS_RESOURCE_CLASS = NRDocumentRecordResource
+NR_DOCUMENTS_RECORDS_SERVICE_CONFIG = NRDocumentRecordServiceConfig
+NR_DOCUMENTS_RECORDS_SERVICE_CLASS = NRDocumentRecordService
