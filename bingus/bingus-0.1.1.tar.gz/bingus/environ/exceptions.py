@@ -1,0 +1,6 @@
+class MissingEnvironmentVariable(Exception):
+    ...
+
+
+class EmptyEnvironmentVariable(Exception):
+    ...
