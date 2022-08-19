@@ -1,0 +1,1 @@
+name = "tencentcloud_manager"
