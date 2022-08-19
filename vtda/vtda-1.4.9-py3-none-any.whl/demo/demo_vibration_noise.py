@@ -1,0 +1,102 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Fri Jun 18 14:49:17 2021
+
+@author: ZSL
+@email: 303466906@qq.com
+
+使用说明：
+1.下载ananconda软件，并安装。
+  登录  https://mirrors.tuna.tsinghua.edu.cn/anaconda/archive/  下载ananconda软件 
+  建议下载Anaconda3-2019.10-Windows-x86_64.exe  为python3.7版本。
+2.安装vtda包
+  打开cmd  即Anaconda Powershell Prompt (Anaconda3)
+  输入 pip install vtda -U 
+3.分析数据
+  使用本demo更改路径和文件名即可使用。
+"""
+
+import sys
+from vtda import (read_dasp_data,  # 读取dasp数据
+                  batch_frequency_vibration_level,  # 分频振级
+                  batch_octave_3,  # 倍频程
+                  batch_fft,  # 频谱
+                  batch_vibration_level,  # Z振级
+                  batch_noise_level, 
+                  batch_noise_level_ssd,
+                  rolling_octave_3)  # A声级
+
+
+dir_='E:/20200620磁各庄实验室/6科研/20220406明航所基金城市轨道交通钢轨波磨车载快速检测技术及装备研发/车内噪声'  #目录 注意目录之间需要用 '/' 而不是 '\'
+name='啊' #文件名 注意文件名不要带试验号
+
+
+#read_dasp_data 读取dasp数据函数
+data,info=read_dasp_data(name=name,   #待读取的实验名
+                         dir_=dir_,   #待读取的路径
+                         num_shiyan='all',#读取的试验号，num_shiyan='3,7,9,20-34'  #试验号，如需读取所有数据 num_shiyan='all'
+                         num_tongdao='all',#读取的通道号，num_tongdao='3,7,9,20-34' #通道号，如需读取所有数据 num_tongdao='all'
+                         ) 
+
+#Z振级批量处理 
+batch_vibration_level(data=data,  #时域数据
+                      info=info,  #数据信息
+                      name=name,  #实验名，保存计算结果时用
+                      dir_=dir_,  #路径，保存计算结果时用                  
+                      cdxs=0.875,  #重叠系数
+                      weight=None,#'weight_vibration_z_13441_1992',
+                      frec=[1,5000],
+                      num_shiyan='all',#计算的试验号，num_shiyan='3,7,9,20-34'  #试验号，如需计算所有数据 num_shiyan='all'
+                      num_tongdao='1-4,7',#计算的通道号，num_tongdao='3,7,9,20-34' #通道号，如需计算所有数据 num_tongdao='all'
+                      )   
+#分频振级批量处理
+batch_frequency_vibration_level(data=data,  #时域数据
+                      info=info,  #数据信息
+                      name=name,  #实验名，保存计算结果时用
+                      dir_=dir_,  #路径，保存计算结果时用                   
+                      cdxs=0.75,  #重叠系数
+                      weight=None,#'weight_vibration_z_13441_1992',
+                      frec=[1,5000],                      
+                      num_shiyan='all',#计算的试验号，num_shiyan='3,7,9,20-34'  #试验号，如需计算所有数据 num_shiyan='all'
+                      num_tongdao='all',#计算的通道号，num_tongdao='3,7,9,20-34' #通道号，如需计算所有数据 num_tongdao='all'
+                      ) 
+#1/3倍频程批量处理
+batch_octave_3(data=data,  #时域数据
+              info=info,  #数据信息
+              name=name,  #实验名，保存计算结果时用
+              dir_=dir_,  #路径，保存计算结果时用                   
+              cdxs=0.75,  #重叠系数
+              num_shiyan='all',#计算的试验号，num_shiyan='3,7,9,20-34'  #试验号，如需计算所有数据 num_shiyan='all'
+              num_tongdao='all',#计算的通道号，num_tongdao='3,7,9,20-34' #通道号，如需计算所有数据 num_tongdao='all'
+              ) 
+#频谱批量处理
+batch_fft(data=data,  #时域数据
+          info=info,  #数据信息
+          name=name,  #实验名，保存计算结果时用
+          dir_=dir_,  #路径，保存计算结果时用                   
+          cdxs=0.75,  #重叠系数
+          num_shiyan='all',#计算的试验号，num_shiyan='3,7,9,20-34'  #试验号，如需计算所有数据 num_shiyan='all'
+          num_tongdao='all',#计算的通道号，num_tongdao='3,7,9,20-34' #通道号，如需计算所有数据 num_tongdao='all'
+          )  
+#A声级批量处理-环境噪声、车内噪声
+batch_noise_level(data=data,  #时域数据
+                      info=info,  #数据信息
+                      name=name,  #实验名，保存计算结果时用
+                      dir_=dir_,  #路径，保存计算结果时用
+                      fft_len=32768/20480, #分析窗长，车内噪声为30s，可以选择1s
+                      cdxs=(32768-20480)/32768,  #重叠系数，应根据窗长进行调整
+                      num_shiyan='all',#计算的试验号，num_shiyan='3,7,9,20-34'  #试验号，如需计算所有数据 num_shiyan='all'
+                      num_tongdao='all',#计算的通道号，num_tongdao='3,7,9,20-34' #通道号，如需计算所有数据 num_tongdao='all'
+                      )
+#A声级批量处理-室内结构二次噪声(secondary structure noise)
+batch_noise_level_ssd(data=data,  #时域数据
+                  info=info,  #数据信息
+                  name=name,  #实验名，保存计算结果时用
+                  dir_=dir_,  #路径，保存计算结果时用                
+                  num_shiyan='all',#计算的试验号，num_shiyan='3,7,9,20-34'  #试验号，如需计算所有数据 num_shiyan='all'
+                  num_tongdao='all',#计算的通道号，num_tongdao='3,7,9,20-34' #通道号，如需计算所有数据 num_tongdao='all'
+                  )
+
+
+
+
