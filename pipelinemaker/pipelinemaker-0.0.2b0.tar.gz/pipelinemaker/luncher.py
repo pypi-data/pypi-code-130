@@ -1,0 +1,3 @@
+from pipelinemaker.experimentmaker import LunchPipelineMaker
+
+LunchPipelineMaker()
