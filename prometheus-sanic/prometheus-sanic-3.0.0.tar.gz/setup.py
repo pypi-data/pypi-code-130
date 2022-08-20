@@ -1,0 +1,30 @@
+# -*- coding: utf-8 -*-
+from setuptools import setup
+
+packages = \
+['prometheus_sanic']
+
+package_data = \
+{'': ['*']}
+
+install_requires = \
+['prometheus-client>=0.7.1,<0.8.0', 'sanic>=22.0.0']
+
+setup_kwargs = {
+    'name': 'prometheus-sanic',
+    'version': '3.0.0',
+    'description': 'Exposes Prometheus monitoring metrics of Sanic apps.',
+    'long_description': 'Sanic prometheus metrics\n=========================\n|Build Status| |PyPI| |PyPI version|\n\nAfter googling for a while I didn\'t find a library that would enable some `prometheus <https://prometheus.io/>`_ metrics for `Sanic <https://github.com/channelcat/sanic>`_-based apps, so I had to write one. It makes adding monitoring to your Sanic app super easy, just add one line to your code (ok, two if you count import :) and point Prometheus to a newly appeared `/metrics` endpoint.\n\nInstallation and enabling monitoring\n-------------------------------------\n\nInstallatio:\n\n.. code:: bash\n\n  pip install prometheus-sanic\n\nEasy-peasy:\n\n.. code:: python\n\n  from sanic import Sanic\n  from prometheus_sanic import monitor\n\n  app = Sanic()\n  ...\n\n  if __name__ == "__main__":\n    monitor(app).expose_endpoint() # adds /metrics endpoint to your Sanic server\n    app.run(host="0.0.0.0", port=8000)\n\n\nActually, there\'re two ways to run monitoring:\n\n\n1. The one you\'ve seen above, ``monitor(app).expose_endpoint()``. \n   It just adds a new ``route`` to your Sanic app, exposing ``/metrics`` endpoint\n   on the same host and port your Sanic server runs. It might be useful if you run your\n   app in a container and you do not want to expose different ports for metrics and everything else.\n   You can customize the ``/metrics`` endpoint by passing the ``metrics_path`` keyword argument:\n   ``monitor(app, metrics_path=\'/my_metrics_path\').expose_endpoint()``.\n2. ``monitor(app).start_server(addr=..., port=...)``.\n   Runs a HTTP server on given address and port and exposes ``/metrics`` endpoint on it.\n   This might be useful if you want to restrict access to your ``/metrics`` endpoint using some\n   firewall rules\n\n\nVersions compatibility\n----------------------\n\n* ☑︎ use **0.1.0** for Sanic <= 0.4.1\n* ☑︎ use **0.1.3** for Sanic >= 0.5.0\n* ☑︎ use >= **0.1.4** if you need multiprocessing support\n* ☑︎ use **0.1.6** if you have to use `promtheus-client` <= 0.4.2\n* ☑︎ use **0.1.8** with `prometheus-client` >= 0.5.0\n* ☑︎ use **0.2.0** with `prometheus-client` >= 0.7.1 and Sanic >= 18.12\n\nExposed metrics\n-----------------\n\nAt the moment ``prometheus-sanic`` provides four metrics:\n\n* **sanic_request_count** - total number of requests (labels: *method*, *endpoint*, *status*) [`counter <https://prometheus.io/docs/concepts/metric_types/#counter>`_]\n* **sanic_request_latency_sec** - request latency in seconds (labels: *method*, *endpoint*) [`histogram <https://prometheus.io/docs/concepts/metric_types/#histogram>`_]\n* **sanic_mem_rss_bytes** - resident memory used by the process (in bytes) [`gauge <https://prometheus.io/docs/concepts/metric_types/#gauge>`_]\n* **sanic_mem_rss_perc** - a percent of total physical memory used by the process running Sanic [`gauge <https://prometheus.io/docs/concepts/metric_types/#gauge>`_]\n  \nLabels\n-----------------\n\n* **method**: a HTTP method (i.e. GET/POST/DELETE/etc)\n* **endpoint**: just a string, a name identifying a point handling a group of requests. By default it\'s just the first element of the relative path of the URL being called (i.e. for http://myhost/a/b/c you\'ll end up having ``/a`` as your endpoint). It is quite configurable, in fact it\'s up you what\'s gonna get to the ``endpoint`` label (see ``help(prometheus_sanic.monitor)`` for more details)\n* **http_status**: a HTTP status code\n\nMultiprocess mode\n-----------------\n\nSanic allows to launch multiple worker processes to utilise parallelisation, which is great but makes metrics collection much trickier (`read more <https://github.com/prometheus/client_python/blob/master/README.md#multiprocess-mode-gunicorn>`_) and introduces some limitations. \n\nIn order to collect metrics from multiple workers, create a directory and point a ``prometheus_multiproc_dir`` environment variable to it. Make sure the directory is empty before you launch your service::\n\n\n     % rm -rf /path/to/your/directory/*\n     % env prometheus_multiproc_dir=/path/to/your/directory python your_sanic_app.py\n\n\nUnfortunately you can not use ``monitor(app).start_server(addr=..., port=...)`` in multiprocess mode as it exposes a prometheus endpoint from a newly created process.\n\nConfiguration\n-----------------\n\nBest you can do is::\n\n     % ipython\n     In [1]: from prometheus_sanic import monitor\n     In [2]: help(monitor)\n\n\nPrometheus quering examples:\n-----------------------------\n\n* *Average latency over last 30 minutes*::\n\n    rate(sanic_request_latency_sec_sum{endpoint=\'/your-endpoint\'}[30m]) / \n    rate(sanic_request_latency_sec_count{endpoint=\'/your-endpoint\'}[30m])\n\n* *95th percentile of request latency*:: \n\n    histogram_quantile(0.95, sum(rate(sanic_request_latency_sec_bucket[5m])) by (le))\n\n* *Physical memory usage percent over last 10 minutes*::\n\n    rate(sanic_mem_rss_perc[10m])\n\n.. |Build Status| image:: https://github.com/skar404/prometheus-sanic/workflows/Tests/badge.svg\n   :target: https://github.com/skar404/prometheus-sanic/actions/\n.. |PyPI| image:: https://img.shields.io/pypi/v/prometheus-sanic.svg\n   :target: https://pypi.python.org/pypi/prometheus-sanic/\n.. |PyPI version| image:: https://img.shields.io/pypi/pyversions/prometheus-sanic.svg\n   :target: https://pypi.python.org/pypi/prometheus-sanic/\n',
+    'author': 'Dan Kruchinin',
+    'author_email': 'dan.kruchinin@gmail.com',
+    'maintainer': None,
+    'maintainer_email': None,
+    'url': 'https://github.com/skar404/prometheus-sanic',
+    'packages': packages,
+    'package_data': package_data,
+    'install_requires': install_requires,
+    'python_requires': '>=3.7,<4.0',
+}
+
+
+setup(**setup_kwargs)
