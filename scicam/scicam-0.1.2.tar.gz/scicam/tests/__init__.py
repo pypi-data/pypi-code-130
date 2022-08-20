@@ -1,0 +1,1 @@
+TEST_DATA_DIR="tests/static_data"
