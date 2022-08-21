@@ -1,0 +1,1 @@
+from .wikionary import inflectWord, getHyperonims, getAssociations, getRandomWord, getPhraseologs, getAntonyms, getSynonims
