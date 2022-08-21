@@ -1,0 +1,1 @@
+from tidal_unofficial.tidal import TidalUnofficial
