@@ -1,0 +1,8 @@
+from pyzeebe_fork.grpc_internals.zeebe_job_adapter import ZeebeJobAdapter
+from pyzeebe_fork.grpc_internals.zeebe_message_adapter import ZeebeMessageAdapter
+from pyzeebe_fork.grpc_internals.zeebe_process_adapter import ZeebeProcessAdapter
+
+
+# Mixin class
+class ZeebeAdapter(ZeebeProcessAdapter, ZeebeJobAdapter, ZeebeMessageAdapter):
+    pass
