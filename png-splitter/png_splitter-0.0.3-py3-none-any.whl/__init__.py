@@ -1,0 +1,1 @@
+from png_splitter.splitter import split_image
