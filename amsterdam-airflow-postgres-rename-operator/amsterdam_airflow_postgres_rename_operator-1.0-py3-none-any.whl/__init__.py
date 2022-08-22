@@ -1,0 +1,1 @@
+from .postgres_rename_operator import PostgresTableRenameOperator
