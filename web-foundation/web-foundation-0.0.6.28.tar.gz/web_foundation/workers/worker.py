@@ -1,0 +1,54 @@
+from __future__ import annotations
+
+from typing import TypeVar
+
+import loguru
+from dependency_injector import containers
+from dependency_injector.wiring import inject, Provide
+
+from web_foundation.app.events.store import StoreUpdateEvent
+from web_foundation.kernel import Isolate
+
+
+class Worker(Isolate):
+    _configured: bool
+
+    def __init__(self, *args, **kwargs):
+        self._configured = False
+
+    @property
+    def configured(self) -> bool:
+        return self._configured
+
+    @inject
+    async def _init_resources(self, app=None, app_container=Provide["<container>"]):
+        init_coro = app_container.init_resources()
+        if init_coro:
+            await init_coro
+        for service in app_container.app().services.values():
+            service.worker = self
+        pass
+
+    def configure(self, name: str, debug=True, *args, **kwargs):
+        self._configure_isolate(name, debug)
+        self._configure(*args, **kwargs)
+        self._configured = True
+
+    @inject
+    async def on_store_update(self, event: StoreUpdateEvent, app_container=Provide["<container>"]):
+        await app_container.store().set_item(event.key, event.value)
+
+    def _configure(self, *args, **kwargs):
+        pass
+
+    def wire_worker(self, container: containers.DeclarativeContainer) -> None:
+        raise NotImplementedError
+
+    async def _run(self):
+        raise NotImplementedError
+
+    def _close(self):
+        pass
+
+
+GenWorker = TypeVar("GenWorker", bound=Worker)
