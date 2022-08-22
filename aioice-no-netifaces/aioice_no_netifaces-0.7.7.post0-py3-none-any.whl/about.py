@@ -1,0 +1,7 @@
+__author__ = "Olli Paloviita"
+__email__ = "olli.paloviita@gmail.com"
+__license__ = "BSD"
+__summary__ = "Jeremy Lainé's aioice library wihtout netifaces dependency"
+__title__ = "aioice-no-netifaces"
+__uri__ = "https://github.com/ollipal/aioice-no-netifaces"
+__version__ = "0.7.7post0"
