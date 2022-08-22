@@ -1,0 +1,3 @@
+import whois
+
+whois.run()
