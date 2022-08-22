@@ -1,0 +1,6 @@
+"""
+rabbit consumer setting
+"""
+
+__version__ = "0.1.1"
+__author__ = 'zeinab'
