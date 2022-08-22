@@ -1,0 +1,1 @@
+from .getface import predict_age_and_gender
