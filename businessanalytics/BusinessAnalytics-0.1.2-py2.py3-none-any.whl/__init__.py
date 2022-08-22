@@ -1,0 +1,3 @@
+# Enables "from BusinessAnalytics import xy" without requiring BusinessAnalytics.BA ....
+from BusinessAnalytics.plotting import plot
+from BusinessAnalytics.dataloader import get_stock_data
