@@ -1,0 +1,1 @@
+DBREPO_TEST_INSTANCE = 'https://dbrepo.ossdip.at'
