@@ -1,0 +1,24 @@
+from setuptools import setup, find_packages
+ 
+classifiers = [
+  'Development Status :: 5 - Production/Stable',
+  'Intended Audience :: Education',
+  'Operating System :: Microsoft :: Windows :: Windows 10',
+  'License :: OSI Approved :: MIT License',
+  'Programming Language :: Python :: 3'
+]
+ 
+setup(
+  name='photopea',
+  version='0.0.4',
+  description='Image and video converter module',
+  long_description=open('README.txt').read() + '\n\n' + open('CHANGELOG.txt').read(),
+  url='',  
+  author='iCoderNet',
+  author_email='iCoderNet@gmail.com',
+  license='MIT', 
+  classifiers=classifiers,
+  keywords='photopea', 
+  packages=find_packages(),
+  install_requires=['opencv-python','numpy','ffmpeg-python'] 
+)
