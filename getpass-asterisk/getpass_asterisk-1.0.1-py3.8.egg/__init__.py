@@ -1,0 +1,1 @@
+name = 'getpass_asterisk'
