@@ -1,0 +1,2 @@
+class MissingAuthorizationHeader(Exception):
+    pass
