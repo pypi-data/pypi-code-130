@@ -1,0 +1,1 @@
+from .common.advanced_print import cprint
