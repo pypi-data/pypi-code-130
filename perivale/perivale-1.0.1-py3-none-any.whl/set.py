@@ -1,0 +1,19 @@
+class Set:
+
+    LOWERCASE = "abcdefghijklmnopqrstuvwxyz"
+    UPPERCASE = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    LETTER = f"{LOWERCASE}{UPPERCASE}"
+
+    DIGIT = "0123456789"
+    HEXADECIMAL = f"abcdefABCDEF{DIGIT}"
+    OCTAL = "01234567"
+
+    INTEGER = f"+-{DIGIT}"
+
+    ALPHANUMERIC = f"{LETTER}{DIGIT}"
+    
+    SNAKE = f"_{ALPHANUMERIC}"
+    KEBAB = f"-{ALPHANUMERIC}"
+    SHOUTING = f"_{UPPERCASE}"
+
+    WHITESPACE = " \t\v\r\n"
