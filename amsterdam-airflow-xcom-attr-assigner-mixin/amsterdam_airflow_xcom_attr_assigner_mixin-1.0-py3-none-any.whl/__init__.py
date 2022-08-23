@@ -1,0 +1,1 @@
+from .xcom_attr_assigner_mixin import XComAttrAssignerMixin
