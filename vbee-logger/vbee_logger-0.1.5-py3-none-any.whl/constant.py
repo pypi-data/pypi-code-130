@@ -1,0 +1,10 @@
+ENV_KEY = "env"
+PRODUCT_KEY = "product"
+SERVICE_KEY = "service"
+CLASS_KEY = "class"
+MESSAGE_KEY = "message"
+	
+INFO = "INFO"
+ERROR = "ERROR"
+WARNING = "WARNING"
+DEBUG = "DEBUG"
